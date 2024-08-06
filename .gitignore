@@ -1,2 +1,3 @@
-node_modules
-build
+# Ignore build and node_modules directories
+build/
+node_modules/
