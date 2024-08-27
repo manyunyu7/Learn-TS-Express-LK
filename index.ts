@@ -9,6 +9,7 @@ import helmet from "helmet";
 
 //Routes;
 import UserRoutes from "./src/routers/UserRoutes";
+import AuthRoutes from "./src/routers/AuthRoutes";
 
 class App {
     public app: Application;
@@ -29,7 +30,7 @@ class App {
 
     protected routes(): void {
 
-
+        this.app.use("/api/v1/auth/",  AuthRoutes.router);
         this.app.use("/api/v1/users/", new UserRoutes().router);
 
         this.app.route("/").get((req: Request, res: Response) => {
