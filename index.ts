@@ -30,12 +30,11 @@ class App {
     protected routes(): void {
 
 
-        this.app.use("", new UserRoutes().router);
+        this.app.use("/api/v1/users/", new UserRoutes().router);
 
         this.app.route("/").get((req: Request, res: Response) => {
             res.send("Hello World!");
         });
-
 
         this.app.route("/login").get((req: Request, res: Response) => {
             res.send("Login Page");
@@ -44,6 +43,36 @@ class App {
         this.app.route("/coba-lagi-ah").post((req: Request, res: Response) => {
             console.log(req.body);
             res.send(req.body);
+        });
+
+        // Define a route to print all routes
+        this.app.route('/doc').get((req: Request, res: Response) => {
+            const routes: any[] = [];
+            app._router.stack.forEach((middleware: any) => {
+                if (middleware.route) {
+                    // If it's a route
+                    Object.keys(middleware.route.methods).forEach((method) => {
+                        routes.push({
+                            method: method.toUpperCase(),
+                            path: middleware.route.path
+                        });
+                    });
+                } else if (middleware.name === 'router') {
+                    // If it's a router
+                    middleware.handle.stack.forEach((handler: any) => {
+                        if (handler.route) {
+                            Object.keys(handler.route.methods).forEach((method) => {
+                                routes.push({
+                                    method: method.toUpperCase(),
+                                    path: handler.route.path
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+
+            res.json(routes);
         });
 
         this.app.route("/as-you-wish").get((req: Request, res: Response) => {
@@ -57,6 +86,8 @@ class App {
         });
 
 
+
+
         //route than define api spesification and version in well structured json
         this.app.route("/api").get((req: Request, res: Response) => {
             const api = {
@@ -65,21 +96,6 @@ class App {
                 description: "My API description"
             };
             res.send(api);
-        });
-
-        //route that return list of users in arrays
-        this.app.route("/users").get((req: Request, res: Response) => {
-            const users = [
-                { id: 1, name: "John" },
-                { id: 2, name: "Jane" },
-                { id: 3, name: "Bob" },
-                { id: 4, name: "Alice" },
-                { id: 4, name: "Su" },
-                { id: 444, name: "Jokowi"},
-                { id: 4, name: "Subhan"},
-                { id: 4, name: "qsss"},
-            ];
-            res.send(users);
         });
     }
 }
