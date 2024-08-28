@@ -6,6 +6,7 @@ import morgan from "morgan";
 import compression from "compression"; //
 import cors from "cors";
 import helmet from "helmet";
+import { configDotenv } from "dotenv";
 
 //Routes;
 import UserRoutes from "./src/routers/UserRoutes";
@@ -18,6 +19,7 @@ class App {
         this.app = express();
         this.plugins();
         this.routes();
+        configDotenv();
     }
 
     protected plugins(): void {
@@ -105,5 +107,66 @@ class App {
 const port: number = 8000;
 const app = new App().app;
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    // Define environment and status symbols
+    const environment = process.env.NODE_ENV?.toUpperCase() || 'DEFAULT';
+    const symbols: Record<string, string> = {
+        DEVELOPMENT: '🔧',
+        PRODUCTION: '🚀',
+        TESTING: '🧪',
+        DEFAULT: '⚙️'
+    };
+    const statusSymbol = symbols[environment] || symbols.DEFAULT;
+
+    // Define arrays for tidbits and tips
+    const tidbits: string[] = [
+        'The longest-running TV show is "The Simpsons," which has been airing since 1989. 📺',
+        'Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still edible! 🍯',
+        'Octopuses have three hearts and blue blood. 💙🐙',
+        'Bananas are berries, but strawberries are not! 🍌🍓'
+    ];
+    const tips: string[] = [
+        'Embrace the challenges and celebrate the small victories. Every bug fixed is a step towards a smoother experience! 🚀',
+        'Break down complex problems into smaller, manageable pieces. It’s easier to tackle smaller tasks one at a time. 🧩',
+        'Keep your code clean and well-documented. It’s easier to maintain and debug in the long run. 📜',
+        'Take regular breaks to avoid burnout. Sometimes a short walk can spark a great idea! 🌿'
+    ];
+
+    // Function to select a random item from an array
+    const getRandomItem = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+    // Generate a unique message with different sections
+    const currentDateTime = new Date().toLocaleString();
+    
+    const asciiArt = `
+      ____  _            _    _            
+     / ___|| |_ __ _  __| |  | |_   ___  ___ 
+     \\___ \\| __/ _\` |/ _\` |  | | | |/ _ \\/ __|
+      ___) | || (_| | (_| |  | | |_| |  __/\\__ \\
+     |____/ \\__\\__,_|\\__,_|  |_|\\__,_|\\___||___/
+    `;
+    
+    const statusMessage = `
+    ************************************************************
+    *                                                          *
+    *                    🎉 Server Status Update! 🎉                    *
+    *                                                          *
+    *   Environment: ${environment} ${statusSymbol}              *
+    *   Port: ${port}                                           *
+    *   Date & Time: ${currentDateTime}                        *
+    *                                                          *
+    *   The server is now live and ready to respond to         *
+    *   requests with exceptional efficiency! 🌟               *
+    *                                                          *
+    *   Here's an interesting tidbit to brighten your day:       *
+    *   ${getRandomItem(tidbits)}                               *
+    *                                                          *
+    *   Tip of the Day:                                         *
+    *   ${getRandomItem(tips)}                                  *
+    *                                                          *
+    *   ${asciiArt}                                           *
+    *                                                          *
+    ************************************************************
+    `;
+    
+    console.log(statusMessage);
 });

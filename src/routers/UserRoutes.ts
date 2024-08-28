@@ -6,7 +6,7 @@ import UserController from "../controllers/UserController";
 
 
 //middleware
-import { auth } from "../middlewares/AuthMiddleware";
+import { auth } from "../middleware/AuthMiddleware";
 
 class UserRoutes extends BaseRoutes {
     routes(): void {
