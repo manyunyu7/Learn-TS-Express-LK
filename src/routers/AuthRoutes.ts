@@ -1,18 +1,9 @@
 import {Router,Request,Response} from 'express';
-import IRouter from './RouteInterface';
+import BaseRoutes from './BaseRouter';
 
 import AuthController from '../controllers/AuthController';
 
-class AuthRoutes implements IRouter {
-
-    public router: Router;
- 
-
-    constructor() {
-        this.router = Router();
-        this.routes();
-    }
-
+class AuthRoutes extends BaseRoutes {
 
     routes(): void {
 
