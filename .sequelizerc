@@ -1,0 +1,25 @@
+
+const path = require('path');
+require("dotenv").config();
+
+//kita harus setting seperti ini karena kita pakai typescript,
+//typescript productionnya akan lari ke folder build dan untuk development cukup di src saja
+//  ./node_modules/.bin/sequelize-cli init
+//  ./node_modules/.bin/sequelize-cli model:generate --name user --attributes username:string,password:string --underscored
+//  ./node_modules/.bin/sequelize-cli db:migrate
+if(process.env.NODE_ENV== 'development'){
+  module.exports = {
+    'config': path.resolve('src/config', 'database.js'),
+    'models-path': path.resolve('src/db', 'models'),
+    'seeders-path': path.resolve('src/db', 'seeders'),
+    'migrations-path': path.resolve('src/db', 'migrations')
+  }
+}else{
+  module.exports = {
+    'config': path.resolve('build/config', 'database.js'),
+    'models-path': path.resolve('build/db', 'models'),
+    'seeders-path': path.resolve('build/db', 'seeders'),
+    'migrations-path': path.resolve('build/db', 'migrations')
+  }
+}
+
