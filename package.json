@@ -9,15 +9,21 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/helmet": "^4.0.0",
+    "@types/jest": "^29.5.12",
     "@types/morgan": "^1.9.9",
+    "@types/supertest": "^6.0.2",
+    "chai": "^5.1.1",
     "express": "^4.19.2",
+    "jest": "^29.7.0",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.4",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.5.4"
   },
   "scripts": {
     "build": "rm -rf build/ && tsc",
     "ts": "rm -rf build/ && tsc -w",
+    "test": "jest",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'tsc && node build/index.js'"
   },
   "dependencies": {

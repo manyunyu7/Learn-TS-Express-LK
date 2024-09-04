@@ -3,7 +3,7 @@ import express, {
 } from "express";
 import bodyParser from "body-parser";
 import morgan from "morgan";
-import compression from "compression"; //
+import compression from "compression";
 import cors from "cors";
 import helmet from "helmet";
 import { configDotenv } from "dotenv";
@@ -32,9 +32,8 @@ class App {
 
     protected routes(): void {
 
-        this.app.use("/api/v1/auth/",  AuthRoutes.router);
         this.app.use("/api/v1/users/", new UserRoutes().router);
-
+        this.app.use("/api/v1/auth/", new AuthRoutes().router);
         this.app.route("/").get((req: Request, res: Response) => {
             res.send("Hello World!");
         });
@@ -88,9 +87,6 @@ class App {
             res.json(requestData);
         });
 
-
-
-
         //route than define api spesification and version in well structured json
         this.app.route("/api").get((req: Request, res: Response) => {
             const api = {
@@ -103,8 +99,40 @@ class App {
     }
 }
 
+export default new App().app;
+
+
+function print(path: string[], layer: any) {
+    if (layer.route) {
+        layer.route.stack.forEach(print.bind(null, path.concat(split(layer.route.path))));
+    } else if (layer.name === 'router' && layer.handle.stack) {
+        layer.handle.stack.forEach(print.bind(null, path.concat(split(layer.regexp))));
+    } else if (layer.method) {
+        console.log('%s /%s',
+            layer.method.toUpperCase(),
+            path.concat(split(layer.regexp)).filter(Boolean).join('/'));
+    }
+}
+
+function split(thing: any): string[] | string {
+    if (typeof thing === 'string') {
+        return thing.split('/');
+    } else if (thing.fast_slash) {
+        return '';
+    } else {
+        const match = thing.toString()
+            .replace('\\/?', '')
+            .replace('(?=\\/|$)', '$')
+            .match(/^\/\^((?:\\[.*+?^${}()|[\]\\\/]|[^.*+?^${}()|[\]\\\/])*)\$\//);
+        return match
+            ? match[1].replace(/\\(.)/g, '$1').split('/')
+            : '<complex:' + thing.toString() + '>';
+    }
+}
+
 const port: number = 8000;
 const app = new App().app;
+app._router.stack.forEach(print.bind(null, []))
 app.listen(port, () => {
     // Define environment and status symbols
     const environment = process.env.NODE_ENV?.toUpperCase() || 'DEFAULT';
@@ -135,7 +163,7 @@ app.listen(port, () => {
 
     // Generate a unique message with different sections
     const currentDateTime = new Date().toLocaleString();
-    
+
     const asciiArt = `
 ██╗   ██╗██╗███╗   ██╗ █████╗ ███╗   ██╗███████╗██╗ █████╗      █████╗ ███████╗███████╗███████╗████████╗    ███╗   ███╗ █████╗ ███╗   ██╗ █████╗  ██████╗ ███████╗███╗   ███╗███████╗███╗   ██╗████████╗
 ██║   ██║██║████╗  ██║██╔══██╗████╗  ██║██╔════╝██║██╔══██╗    ██╔══██╗██╔════╝██╔════╝██╔════╝╚══██╔══╝    ████╗ ████║██╔══██╗████╗  ██║██╔══██╗██╔════╝ ██╔════╝████╗ ████║██╔════╝████╗  ██║╚══██╔══╝
@@ -144,7 +172,7 @@ app.listen(port, () => {
  ╚████╔╝ ██║██║ ╚████║██║  ██║██║ ╚████║███████║██║██║  ██║    ██║  ██║███████║███████║███████╗   ██║       ██║ ╚═╝ ██║██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████╗██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   
   ╚═══╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝╚═╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝   ╚═╝       ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
     `;
-    
+
     const statusMessage = `
     ************************************************************
     *                                                          *
@@ -163,10 +191,9 @@ app.listen(port, () => {
     *   Tip of the Day:                                         *
     *   ${getRandomItem(tips)}                                  *
     *                                                          *
-    *   ${asciiArt}                                           *
     *                                                          *
     ************************************************************
     `;
-    
+
     console.log(statusMessage);
 });

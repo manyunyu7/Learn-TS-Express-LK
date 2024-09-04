@@ -7,6 +7,8 @@ require("dotenv").config();
 //  ./node_modules/.bin/sequelize-cli init
 //  ./node_modules/.bin/sequelize-cli model:generate --name user --attributes username:string,password:string --underscored
 //  ./node_modules/.bin/sequelize-cli db:migrate
+// npx sequelize-cli db:migrate
+// npx sequelize-cli db:migrate:undo
 if(process.env.NODE_ENV== 'development'){
   module.exports = {
     'config': path.resolve('src/config', 'database.js'),

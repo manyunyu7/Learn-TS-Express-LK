@@ -15,7 +15,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   user.init({
     username: DataTypes.STRING,
-    password: DataTypes.STRING
+    password: DataTypes.STRING,
+    // add nickname nullable for users who don't want to set a nickname
+    nickname: DataTypes.STRING
+
   }, {
     sequelize,
     modelName: 'user',
