@@ -9,7 +9,6 @@ class AuthController {
     //register method with sequelize
     async register(req: Request, res: Response): Promise<Response> {
 
-
         // Extract username and password from the request body
         let username = req.body.username;
         let password = req.body.password;

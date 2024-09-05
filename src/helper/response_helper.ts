@@ -1,27 +1,25 @@
 
 
-//class to structure all response within the API, as a common format
+// Define your ResponseDTO class
 export class ResponseDTO {
-    public status: number;
-    public message: string;
-    public data: any;
+    public meta: {
+        success: boolean;
+        status: number;
+        message: string;
+    };
+    public result: any;
 
-    constructor(status: number, message: string, data: any) {
-        this.status = status;
-        this.message = message;
-        this.data = data;
+    constructor(success: boolean, status: number, message: string, result: any) {
+        this.meta = {
+            success: success,
+            status: status,
+            message: message
+        };
+        this.result = result;
     }
 }
 
-/**
- * Creates a new instance of {@link ResponseDTO} with the provided status, message, and data.
- *
- * @param status - The HTTP status code for the response.
- * @param message - A brief description of the response.
- * @param data - The payload of the response.
- *
- * @returns A new instance of {@link ResponseDTO} with the provided parameters.
- */
-export function responseSuccess(status: number, message: string, data: any): ResponseDTO {
-    return new ResponseDTO(status, message, data);
+// Function to create a success response
+export function responseSuccess(status: number, message: string, result: any): ResponseDTO {
+    return new ResponseDTO(true, status, message, result);
 }
