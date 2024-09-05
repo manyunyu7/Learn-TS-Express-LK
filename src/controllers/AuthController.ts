@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { responseSuccess } from "../helper/response_helper";
+import { flushResponse } from "../helper/response_helper";
 import PasswordHash from "../helper/PasswordHash";
 const db = require('../db/models');
 
@@ -18,11 +18,11 @@ class AuthController {
         // Use try-catch blocks to handle any errors that may occur during database operations.
         // Example validation
         if (!username || !password) {
-            return res.send(responseSuccess(400, "Username and password are required", null));
+            return res.send(flushResponse(400, "Username and password are required", null));
         }
 
         if (username.length < 5 || password.length < 8) {
-            return res.send(responseSuccess(400, "Username and password must be at least 5 characters and 8 characters long", null));
+            return res.send(flushResponse(400, "Username and password must be at least 5 characters and 8 characters long", null));
         }
 
         let encryptedPassword = await PasswordHash.hashPassword(password);

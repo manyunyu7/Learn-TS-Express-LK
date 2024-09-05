@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction } from 'express';
 import {check, validationResult } from 'express-validator';
-import { responseSuccess } from '../helper/response_helper';
+import { flushResponse } from '../helper/response_helper';
 
 
 
@@ -17,7 +17,7 @@ const validate = [
             const errorMessages = errors.array().map(err => err.msg).join(', ');
 
             // Send response with summarized error message in Bahasa Indonesia
-            return res.status(400).send(responseSuccess(400, `Validasi gagal: ${errorMessages}`, null));
+            return res.status(400).send(flushResponse(400, `Validasi gagal: ${errorMessages}`, null));
         }
         next();
     }
