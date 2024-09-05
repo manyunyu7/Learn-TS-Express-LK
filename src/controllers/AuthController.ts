@@ -30,7 +30,7 @@ class AuthController {
         // Check if a user with the same username already exists
         let existingUser = await db.user.findOne({ where: { username: username } });
         if (existingUser) {
-            return res.send(responseSuccess(400, "A user with the same username already exists", null));
+            return res.send(flushResponse(400, "A user with the same username already exists", null));
         }
 
         res.status(201); // Created status code
@@ -43,7 +43,7 @@ class AuthController {
         });
 
         user.nickname = "";
-        return res.send(responseSuccess(200, "User created successfully", user));
+        return res.send(flushResponse(200, "User created successfully", user));
 
     }
 }

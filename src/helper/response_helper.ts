@@ -20,6 +20,6 @@ export class ResponseDTO {
 }
 
 // Function to create a success response
-export function flushResponse(status: number, message: string, result: any): ResponseDTO {
-    return new ResponseDTO(true, status, message, result);
+export function flushResponse(status: number, message: string, result: any, isSuccess?:boolean): ResponseDTO {
+    return new ResponseDTO(isSuccess ?? true, status, message, result);
 }
