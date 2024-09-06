@@ -6,7 +6,6 @@ const db = require('../db/models');
 
 class AuthController {
 
-
     printSomething(): void {
         console.log('Printing something...');
     }
@@ -33,10 +32,26 @@ class AuthController {
             return res.send(flushResponse(400, "Username or password is incorrect", null));
         }
 
-  
-        return res.send(flushResponse(200, "Login successful", user));
+
+        // Generate a JSON Web Token (JWT) for the authenticated user
+        let token = PasswordHash.generateToken(user.id, user.username, user.password);
+        return res.send(flushResponse(200, "Login successful", { user:user,token: token }));
     }
 
+    async profile(req: Request, res: Response): Promise<Response> {
+
+
+        return res.status(201).send(flushResponse(200, "Profile data", req.app.get("user")));
+        let user = await db.user.findByPk(req.app.get("user").id);
+
+        // If user is not found, send a 404 response
+        if (!user) {
+            return res.send(flushResponse(404, "User not found", null));
+        }else{
+            return res.send(flushResponse(200, "Profile data", user));
+        }
+    }
+  
     //register method with sequelize
     async register(req: Request, res: Response): Promise<Response> {
 
@@ -77,8 +92,6 @@ class AuthController {
         return res.send(flushResponse(200, "User created successfully", user));
 
     }
-
-
 
     // Example function that represents a task
     async performTask(taskId: number): Promise<void> {
