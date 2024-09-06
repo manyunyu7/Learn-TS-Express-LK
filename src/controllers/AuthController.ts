@@ -39,11 +39,8 @@ class AuthController {
     }
 
     async profile(req: Request, res: Response): Promise<Response> {
-
-
         return res.status(201).send(flushResponse(200, "Profile data", req.app.get("user")));
         let user = await db.user.findByPk(req.app.get("user").id);
-
         // If user is not found, send a 404 response
         if (!user) {
             return res.send(flushResponse(404, "User not found", null));

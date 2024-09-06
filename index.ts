@@ -11,6 +11,7 @@ import { configDotenv } from "dotenv";
 //Routes;
 import UserRoutes from "./src/routers/UserRoutes";
 import AuthRoutes from "./src/routers/AuthRoutes";
+import TodoRoutes from "./src/routers/TodoRoutes";
 
 class App {
     public app: Application;
@@ -34,6 +35,8 @@ class App {
 
         this.app.use("/api/v1/users/", new UserRoutes().router);
         this.app.use("/api/v1/auth/", new AuthRoutes().router);
+        this.app.use("/api/v1/todo/",new TodoRoutes().router);
+
         this.app.route("/").get((req: Request, res: Response) => {
             res.send("Hello World!");
         });

@@ -41,6 +41,7 @@
     "mysql2": "^3.11.0",
     "sequelize": "^6.37.3",
     "sequelize-cli": "^6.6.2",
-    "supertest": "^7.0.0"
+    "supertest": "^7.0.0",
+    "uuid": "^10.0.0"
   }
 }

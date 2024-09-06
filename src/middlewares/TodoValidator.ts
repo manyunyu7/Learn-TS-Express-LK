@@ -3,12 +3,9 @@ import {check, validationResult } from 'express-validator';
 import { flushResponse } from '../helper/response_helper';
 
 
-
-const validate = [
-    check('username').notEmpty().withMessage('Username perlu diisi'),
-    check('password').notEmpty().withMessage('Password perlu diisi'),
-    //nickname is allowed to be empty, but if provided, it should be at least 3 characters long
-    check('nickname').optional().isLength({ min: 3 }).withMessage('Nickname minimal 3 karakter'),
+const validateTodo = [
+    check('description').notEmpty().withMessage('Deskripsi perlu diisi'),
+    //userId cant be empty, taken from middlewares/AuthMiddleware
 
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
@@ -23,4 +20,4 @@ const validate = [
     }
 ];
 
-export default validate;
+export default validateTodo;
