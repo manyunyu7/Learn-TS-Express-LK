@@ -6,6 +6,37 @@ const db = require('../db/models');
 
 class AuthController {
 
+
+    printSomething(): void {
+        console.log('Printing something...');
+    }
+
+    //login method with jwt
+    async login(req: Request, res: Response): Promise<Response> {
+        let username = req.body.username;
+        let password = req.body.password;
+
+        // check if username and password are provided
+        if (!username || !password) {
+            return res.send(flushResponse(400, "Username and password are required", null));
+        }
+
+        // check if username and password are correct
+        let user = await db.user.findOne({ where: { username: username } });
+        if (!user) {
+            return res.send(flushResponse(400, "Username or password is incorrect", null));
+        }
+
+        // check if password is correct
+        let isPasswordValid = await PasswordHash.comparePassword(password, user.password);
+        if (!isPasswordValid) {
+            return res.send(flushResponse(400, "Username or password is incorrect", null));
+        }
+
+  
+        return res.send(flushResponse(200, "Login successful", user));
+    }
+
     //register method with sequelize
     async register(req: Request, res: Response): Promise<Response> {
 
@@ -45,6 +76,34 @@ class AuthController {
         user.nickname = "";
         return res.send(flushResponse(200, "User created successfully", user));
 
+    }
+
+
+
+    // Example function that represents a task
+    async performTask(taskId: number): Promise<void> {
+        // Simulating some asynchronous task
+        await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+        console.log(`Task ${taskId} completed.`);
+    }
+
+    async executeTasks(req: Request, res: Response): Promise<void> {
+        const tasksCount = 10000;
+        const tasks = [];
+
+        // Creating an array of promises representing each task
+        for (let i = 0; i < tasksCount; i++) {
+            tasks.push(this.performTask.bind(this, i)()); // Bind `this` to maintain context
+        }
+
+        try {
+            // Execute all tasks concurrently
+            await Promise.all(tasks);
+            res.status(200).json({ message: `${tasksCount} tasks executed successfully.` });
+        } catch (error) {
+            console.error('Error executing tasks:', error);
+            res.status(500).json({ error: 'Failed to execute tasks.' });
+        }
     }
 }
 
