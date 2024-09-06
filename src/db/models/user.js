@@ -4,6 +4,16 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
+
+
+    //relationship with todos table
+    static associate(models) {
+      user.hasMany(models.todo, {
+        foreignKey: 'user_id',
+        as: 'todos'
+      });
+    }
+
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.

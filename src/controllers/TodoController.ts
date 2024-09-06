@@ -1,16 +1,25 @@
 import { Request, Response } from "express";
 import { flushResponse } from "../helper/response_helper";
-import PasswordHash from "../helper/PasswordHash";
 import IController from "./ControllerInterface";
-
 
 const db = require('../db/models');
 
 class TodoController implements IController {
 
+    async index(req: Request, res: Response): Promise<Response> {
+        try {
+            const query = `
+            SELECT todos.*, users.username, users.nickname 
+            FROM todos 
+            LEFT JOIN users ON todos.user_id = users.id
+          `;
 
-    index(req: Request, res: Response): Promise<Response> {
-        throw "";
+            const todos = await db.sequelize.query(query, { type: db.Sequelize.QueryTypes.SELECT });
+
+            return res.send(flushResponse(200, "Todos fetched successfully", todos));
+        } catch (error) {
+            return res.status(500).send(flushResponse(500, "Error fetching todos", error));
+        }
     }
 
     async create(req: Request, res: Response): Promise<Response> {
@@ -32,15 +41,52 @@ class TodoController implements IController {
         }
     }
 
+    async show(req: Request, res: Response): Promise<Response> {
+        const id = req.params.id;
+        const query: string = `SELECT * FROM todos WHERE id = ?`;
+        const result = await db.sequelize.query(query,
+            {
+                replacements: [id], type: db.Sequelize.QueryTypes.SELECT
+            }
+        );
+        return res.send(flushResponse(200, "Todo fetched successfully", result));
+    }
 
-    show(req: Request, res: Response): Promise<Response> {
-        throw new Error("Method not implemented.");
+    async update(req: Request, res: Response): Promise<Response> {
+        const id: number = parseInt(req.params.id);
+        const description: string = req.body.description;
+        const userId: number = req.app.locals.credentials.id;
+
+        const todo = db.todo.update({
+            description: description,
+            user_id: userId
+        }, {
+            where: {
+                id: id
+            }
+        });
+
+        if (todo) {
+            return res.send(flushResponse(200, "Todo updated successfully", null));
+        } else {
+            return res.status(404).send(flushResponse(404, "Todo not found", null));
+        }
     }
-    update(req: Request, res: Response): Promise<Response> {
-        throw new Error("Method not implemented.");
-    }
-    delete(req: Request, res: Response): Promise<Response> {
-        throw new Error("Method not implemented.");
+
+
+    async delete(req: Request, res: Response): Promise<Response> {
+        const id: number = parseInt(req.params.id);
+        const todo = db.todo.destroy({
+            where: {
+                id: id
+            }
+        });
+
+        if (todo) {
+            return res.send(flushResponse(200, "Todo deleted successfully", null));
+        } else {
+            return res.status(404).send(flushResponse(404, "Todo not found", null));
+        }
     }
 
 
