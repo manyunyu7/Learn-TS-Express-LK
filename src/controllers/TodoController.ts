@@ -1,34 +1,25 @@
 import { Request, Response } from "express";
 import { flushResponse } from "../helper/response_helper";
 import IController from "./ControllerInterface";
-
+import Siquel from "../helper/siquel/Siquel";
 const db = require('../db/models');
 
 class TodoController implements IController {
     async index(req: Request, res: Response): Promise<Response> {
         try {
             const searchQuery = req.query.q as string;
-            let query = `
-            SELECT todos.*, users.username as 'user username', users.nickname 
-            FROM todos 
-            LEFT JOIN users ON todos.user_id = users.id
-            WHERE todos.user_id = :userId
-            `;
+
+            let result = new Siquel(db.sequelize, 'todos')
+                .select(['todos.id', 'description', 'user_id'])
+                .leftJoin('users', 'todos.user_id = user.id', 'user')
+                .where('todos.user_id', '=', req.app.locals.credentials.id);
 
             if (searchQuery) {
-                query += `
-                AND (todos.description LIKE :searchQuery OR users.username LIKE :searchQuery OR users.nickname LIKE :searchQuery)
-                `;
+                result.where('user.username LIKE :searchQuery OR user.nickname LIKE :searchQuery', `%${searchQuery}%`);
             }
-    
-            const todos = await db.sequelize.query(query, {
-                type: db.Sequelize.QueryTypes.SELECT,
-                replacements: {
-                    userId: req.app.locals.credentials.id,
-                    searchQuery: `%${searchQuery}%`
-                }
-            });
-    
+
+            const todos = await result.execute();
+
             return res.send(flushResponse(200, "Todos fetched successfully", todos));
         } catch (error) {
             console.error(error);
@@ -36,18 +27,21 @@ class TodoController implements IController {
         }
     }
 
-
     async create(req: Request, res: Response): Promise<Response> {
         let description: string = req.body.description;
         let userId: number = req.app.locals.credentials.id
 
+        const result = new Siquel(db.sequelize, 'todos')
+            .insert({
+                description: description,
+                user_id: userId,
+            });
+
         console.log("Info Info Masseh");
         console.log("User ID: ", userId);
 
-        const todo = await db.todo.create({
-            description: description,
-            user_id: userId
-        });
+        var todo = await result.execute();
+
 
         if (todo) {
             return res.send(flushResponse(200, "Todo created successfully", todo));
@@ -58,17 +52,13 @@ class TodoController implements IController {
 
     async show(req: Request, res: Response): Promise<Response> {
         const id = req.params.id;
-        const userId = req.app.locals.credentials.id;
-        const query: string = `SELECT * FROM todos WHERE id = :id AND user_id = :user_id`;
-        const result = await db.sequelize.query(query,
-            {
-                replacements: {
-                    id: id,
-                    user_id: userId
-                },
-                type: db.Sequelize.QueryTypes.SELECT
-            }
-        );
+
+        const result = await new Siquel(db.sequelize, 'todos')
+            .select(['todos.id', 'description', 'user_id'])
+            .leftJoin('users', 'todos.user_id = user.id', 'user')
+            .where('todos.id', '=', id)
+            .execute();
+
         return res.send(flushResponse(200, "Todo fetched successfully", result));
     }
 
