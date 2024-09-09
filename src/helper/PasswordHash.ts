@@ -26,10 +26,10 @@ class PasswordHash {
         }
     }
 
-    public static generateToken(id: number, username: string, password: string): string {
+    public static generateToken(id: number, username: string): string {
         const secretKey: string = process.env.JWT_SECRET_KEY as string;
 
-        const token: string = jwt.sign({ id, username, password }, secretKey, {
+        const token: string = jwt.sign({ id, username }, secretKey, {
             expiresIn: "1d"
         });
         return token;

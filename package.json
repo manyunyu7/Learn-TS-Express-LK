@@ -20,13 +20,14 @@
     "morgan": "^1.10.0",
     "nodemon": "^3.1.4",
     "ts-jest": "^29.2.5",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.4"
   },
   "scripts": {
     "build": "rm -rf build/ && tsc",
     "ts": "rm -rf build/ && tsc -w",
     "test": "jest",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'tsc && node build/index.js'"
+    "dev": "ts-node-dev --no-deprecation --respawn --transpile-only ./index.ts"
   },
   "dependencies": {
     "axios": "^1.7.3",

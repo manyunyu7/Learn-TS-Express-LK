@@ -5,22 +5,37 @@ import IController from "./ControllerInterface";
 const db = require('../db/models');
 
 class TodoController implements IController {
-
     async index(req: Request, res: Response): Promise<Response> {
         try {
-            const query = `
-            SELECT todos.*, users.username, users.nickname 
+            const searchQuery = req.query.q as string;
+            let query = `
+            SELECT todos.*, users.username as 'user username', users.nickname 
             FROM todos 
             LEFT JOIN users ON todos.user_id = users.id
-          `;
+            WHERE todos.user_id = :userId
+            `;
 
-            const todos = await db.sequelize.query(query, { type: db.Sequelize.QueryTypes.SELECT });
-
+            if (searchQuery) {
+                query += `
+                AND (todos.description LIKE :searchQuery OR users.username LIKE :searchQuery OR users.nickname LIKE :searchQuery)
+                `;
+            }
+    
+            const todos = await db.sequelize.query(query, {
+                type: db.Sequelize.QueryTypes.SELECT,
+                replacements: {
+                    userId: req.app.locals.credentials.id,
+                    searchQuery: `%${searchQuery}%`
+                }
+            });
+    
             return res.send(flushResponse(200, "Todos fetched successfully", todos));
         } catch (error) {
+            console.error(error);
             return res.status(500).send(flushResponse(500, "Error fetching todos", error));
         }
     }
+
 
     async create(req: Request, res: Response): Promise<Response> {
         let description: string = req.body.description;
@@ -43,10 +58,15 @@ class TodoController implements IController {
 
     async show(req: Request, res: Response): Promise<Response> {
         const id = req.params.id;
-        const query: string = `SELECT * FROM todos WHERE id = ?`;
+        const userId = req.app.locals.credentials.id;
+        const query: string = `SELECT * FROM todos WHERE id = :id AND user_id = :user_id`;
         const result = await db.sequelize.query(query,
             {
-                replacements: [id], type: db.Sequelize.QueryTypes.SELECT
+                replacements: {
+                    id: id,
+                    user_id: userId
+                },
+                type: db.Sequelize.QueryTypes.SELECT
             }
         );
         return res.send(flushResponse(200, "Todo fetched successfully", result));
